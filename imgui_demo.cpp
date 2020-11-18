@@ -3460,7 +3460,7 @@ static void ShowDemoWindowTables()
                         continue;
 
                     char buf[32];
-                    sprintf(buf, "Hello %d,%d", row, column);
+                    sprintf(buf, "Hello %d,%d", column, row);
                     if (contents_type == CT_Text)
                         ImGui::TextUnformatted(buf);
                     else if (contents_type)
@@ -3493,7 +3493,7 @@ static void ShowDemoWindowTables()
                 for (int column = 0; column < 3; column++)
                 {
                     ImGui::TableSetColumnIndex(column);
-                    ImGui::Text("Hello %d,%d", row, column);
+                    ImGui::Text("Hello %d,%d", column, row);
                 }
             }
             ImGui::EndTable();
@@ -3523,7 +3523,7 @@ static void ShowDemoWindowTables()
                 for (int column = 0; column < 3; column++)
                 {
                     ImGui::TableSetColumnIndex(column);
-                    ImGui::Text("Hello %d,%d", row, column);
+                    ImGui::Text("Hello %d,%d", column, row);
                 }
             }
             ImGui::EndTable();
@@ -3550,7 +3550,7 @@ static void ShowDemoWindowTables()
                 for (int column = 0; column < 3; column++)
                 {
                     ImGui::TableSetColumnIndex(column);
-                    ImGui::Text("%s %d,%d", (column == 2) ? "Stretch" : "Fixed", row, column);
+                    ImGui::Text("%s %d,%d", (column == 2) ? "Stretch" : "Fixed", column, row);
                 }
             }
             ImGui::EndTable();
@@ -3570,7 +3570,7 @@ static void ShowDemoWindowTables()
                 for (int column = 0; column < 6; column++)
                 {
                     ImGui::TableSetColumnIndex(column);
-                    ImGui::Text("%s %d,%d", (column >= 3) ? "Stretch" : "Fixed", row, column);
+                    ImGui::Text("%s %d,%d", (column >= 3) ? "Stretch" : "Fixed", column, row);
                 }
             }
             ImGui::EndTable();
@@ -3606,7 +3606,7 @@ static void ShowDemoWindowTables()
                 for (int column = 0; column < 3; column++)
                 {
                     ImGui::TableSetColumnIndex(column);
-                    ImGui::Text("Hello %d,%d", row, column);
+                    ImGui::Text("Hello %d,%d", column, row);
                 }
             }
             ImGui::EndTable();
@@ -3624,7 +3624,7 @@ static void ShowDemoWindowTables()
                 for (int column = 0; column < 3; column++)
                 {
                     ImGui::TableSetColumnIndex(column);
-                    ImGui::Text("Fixed %d,%d", row, column);
+                    ImGui::Text("Fixed %d,%d", column, row);
                 }
             }
             ImGui::EndTable();
@@ -3681,7 +3681,7 @@ static void ShowDemoWindowTables()
                     else
                     {
                         char buf[32];
-                        sprintf(buf, "Hello %d,%d", row, column);
+                        sprintf(buf, "Hello %d,%d", column, row);
                         ImGui::Button(buf, ImVec2(-FLT_MIN, 0.0f));
                     }
                     //if (ImGui::TableGetHoveredColumn() == column)
@@ -3720,7 +3720,7 @@ static void ShowDemoWindowTables()
                     ImGui::TableSetColumnIndex(column);
                     if (row == 0)
                         ImGui::Text("(%.2f)", ImGui::GetContentRegionAvail().x);
-                    ImGui::Text("Hello %d,%d", row, column);
+                    ImGui::Text("Hello %d,%d", column, row);
                 }
             }
             ImGui::EndTable();
@@ -3761,7 +3761,7 @@ static void ShowDemoWindowTables()
                     for (int column = 0; column < 3; column++)
                     {
                         ImGui::TableSetColumnIndex(column);
-                        ImGui::Text("Hello %d,%d", row, column);
+                        ImGui::Text("Hello %d,%d", column, row);
                     }
                 }
             }
@@ -3790,8 +3790,8 @@ static void ShowDemoWindowTables()
 
         // When using ScrollX or ScrollY we need to specify a size for our table container!
         // Otherwise by default the table will fit all available space, like a BeginChild() call.
-        ImVec2 size = ImVec2(0, TEXT_BASE_HEIGHT * 8);
-        if (ImGui::BeginTable("##table1", 7, flags, size))
+        ImVec2 outer_size = ImVec2(0, TEXT_BASE_HEIGHT * 8);
+        if (ImGui::BeginTable("##table1", 7, flags, outer_size))
         {
             ImGui::TableSetupScrollFreeze(freeze_cols, freeze_rows);
             ImGui::TableSetupColumn("Line #", ImGuiTableColumnFlags_NoHide); // Make the first column not hideable to match our use of TableSetupScrollFreeze()
@@ -3813,7 +3813,7 @@ static void ShowDemoWindowTables()
                     if (column == 0)
                         ImGui::Text("Line %d", row);
                     else
-                        ImGui::Text("Hello world %d,%d", row, column);
+                        ImGui::Text("Hello world %d,%d", column, row);
                 }
             }
             ImGui::EndTable();
@@ -3958,14 +3958,15 @@ static void ShowDemoWindowTables()
         ImGui::SameLine(); HelpMarker("Default if _ScrollX if disabled. Makes columns use _WidthStretch policy by default.");
         if (ImGui::CheckboxFlags("ImGuiTableFlags_SizingPolicyFixedX", &flags, ImGuiTableFlags_SizingPolicyFixedX))
             flags &= ~(ImGuiTableFlags_SizingPolicyMaskX_ ^ ImGuiTableFlags_SizingPolicyFixedX);    // Can't specify both sizing polices so we clear the other
-        ImGui::SameLine(); HelpMarker("Default if _ScrollX if enabled. Makes columns use _WidthFixed by default, or _WidthAlwaysAutoResize if _Resizable is not set.");
+        ImGui::SameLine(); HelpMarker("Default if _ScrollX if enabled. Makes columns use _WidthFixed by default, or _WidthFixedResize if _Resizable is not set.");
         ImGui::CheckboxFlags("ImGuiTableFlags_PreciseStretchWidths", &flags, ImGuiTableFlags_PreciseStretchWidths);
         ImGui::SameLine(); HelpMarker("Disable distributing remainder width to stretched columns (width allocation on a 100-wide table with 3 columns: Without this flag: 33,33,34. With this flag: 33,33,33). With larger number of columns, resizing will appear to be less smooth.");
         ImGui::CheckboxFlags("ImGuiTableFlags_Resizable", &flags, ImGuiTableFlags_Resizable);
         ImGui::CheckboxFlags("ImGuiTableFlags_NoClip", &flags, ImGuiTableFlags_NoClip);
         PopStyleCompact();
 
-        if (ImGui::BeginTable("##nways", column_count, flags, ImVec2(0, 100)))
+        ImVec2 outer_size(0, TEXT_BASE_HEIGHT * 7);
+        if (ImGui::BeginTable("##nways", column_count, flags, outer_size))
         {
             for (int row = 0; row < 10; row++)
             {
@@ -3975,11 +3976,11 @@ static void ShowDemoWindowTables()
                     ImGui::TableSetColumnIndex(column);
                     char label[32];
                     static char text_buf[32] = "";
-                    sprintf(label, "Hello %d,%d", row, column);
+                    sprintf(label, "Hello %d,%d", column, row);
                     switch (contents_type)
                     {
                     case CT_ShortText:  ImGui::TextUnformatted(label); break;
-                    case CT_LongText:   ImGui::Text("Some longer text %d,%d\nOver two lines..", row, column); break;
+                    case CT_LongText:   ImGui::Text("Some longer text %d,%d\nOver two lines..", column, row); break;
                     case CT_Button:     ImGui::Button(label); break;
                     case CT_FillButton: ImGui::Button(label, ImVec2(-FLT_MIN, 0.0f)); break;
                     case CT_InputText:  ImGui::SetNextItemWidth(-FLT_MIN); ImGui::InputText("##", text_buf, IM_ARRAYSIZE(text_buf)); break;
@@ -3988,6 +3989,35 @@ static void ShowDemoWindowTables()
             }
             ImGui::EndTable();
         }
+
+        HelpMarker(
+            "Showcase using Stretch columns + ScrollX together: "
+            "this is rather unusual and only makes sense when specifying an 'inner_width' for the table!\n"
+            "Without an explicit value, inner_width is == outer_size.x and therefore using Stretch columns + ScrollX together doesn't make sense.");
+        static ImGuiTableFlags flags2 = ImGuiTableFlags_SizingPolicyStretchX | ImGuiTableFlags_ScrollX | ImGuiTableFlags_ScrollY | ImGuiTableFlags_BordersOuter | ImGuiTableFlags_RowBg;
+        static float inner_width = 1000.0f;
+        PushStyleCompact();
+        ImGui::PushID("flags2");
+        ImGui::CheckboxFlags("ImGuiTableFlags_ScrollX", &flags2, ImGuiTableFlags_ScrollX);
+        if (ImGui::CheckboxFlags("ImGuiTableFlags_SizingPolicyStretchX", &flags2, ImGuiTableFlags_SizingPolicyStretchX))
+            flags2 &= ~(ImGuiTableFlags_SizingPolicyMaskX_ ^ ImGuiTableFlags_SizingPolicyStretchX);
+        if (ImGui::CheckboxFlags("ImGuiTableFlags_SizingPolicyFixedX", &flags2, ImGuiTableFlags_SizingPolicyFixedX))
+            flags2 &= ~(ImGuiTableFlags_SizingPolicyMaskX_ ^ ImGuiTableFlags_SizingPolicyFixedX);
+        ImGui::SetNextItemWidth(TEXT_BASE_WIDTH * 10.0f);
+        ImGui::DragFloat("inner_width", &inner_width, 1.0f, 0.0f, FLT_MAX, "%.1f");
+        ImGui::PopID();
+        PopStyleCompact();
+
+        if (ImGui::BeginTable("##table2", 7, flags2 | ImGuiTableFlags_SizingPolicyStretchX | ImGuiTableFlags_ContextMenuInBody, outer_size, inner_width))
+        {
+            for (int cell = 0; cell < 20 * 7; cell++)
+            {
+                ImGui::TableNextColumn();
+                ImGui::Text("Hello world %d,%d", ImGui::TableGetColumnIndex(), ImGui::TableGetRowIndex());
+            }
+            ImGui::EndTable();
+        }
+
         ImGui::TreePop();
     }
 
@@ -4219,7 +4249,7 @@ static void ShowDemoWindowTables()
                 for (int column = 0; column < 3; column++)
                 {
                     char buf[32];
-                    sprintf(buf, "Cell %d,%d", row, column);
+                    sprintf(buf, "Cell %d,%d", column, row);
                     ImGui::TableSetColumnIndex(column);
                     ImGui::Selectable(buf, column_selected[column]);
                 }
@@ -4462,7 +4492,7 @@ static void ShowDemoWindowTables()
                 ImGui::TreePop();
             }
 
-            if (ImGui::TreeNodeEx("Decoration:", ImGuiTreeNodeFlags_DefaultOpen))
+            if (ImGui::TreeNodeEx("Decorations:", ImGuiTreeNodeFlags_DefaultOpen))
             {
                 ImGui::CheckboxFlags("ImGuiTableFlags_RowBg", &flags, ImGuiTableFlags_RowBg);
                 ImGui::CheckboxFlags("ImGuiTableFlags_BordersV", &flags, ImGuiTableFlags_BordersV);
@@ -4575,8 +4605,8 @@ static void ShowDemoWindowTables()
             ImGui::TableSetupColumn("ID",          ImGuiTableColumnFlags_DefaultSort | ImGuiTableColumnFlags_WidthFixed | ImGuiTableColumnFlags_NoHide, -1.0f, MyItemColumnID_ID);
             ImGui::TableSetupColumn("Name",        ImGuiTableColumnFlags_WidthFixed, -1.0f, MyItemColumnID_Name);
             ImGui::TableSetupColumn("Action",      ImGuiTableColumnFlags_NoSort | ImGuiTableColumnFlags_WidthFixed, -1.0f, MyItemColumnID_Action);
-            ImGui::TableSetupColumn("Quantity Long Label", ImGuiTableColumnFlags_PreferSortDescending | ImGuiTableColumnFlags_WidthStretch, 1.0f, MyItemColumnID_Quantity);// , ImGuiTableColumnFlags_None | ImGuiTableColumnFlags_WidthAlwaysAutoResize);
-            ImGui::TableSetupColumn("Description", ImGuiTableColumnFlags_WidthStretch, 1.0f, MyItemColumnID_Description);// , ImGuiTableColumnFlags_WidthAlwaysAutoResize);
+            ImGui::TableSetupColumn("Quantity (Long Label)", ImGuiTableColumnFlags_PreferSortDescending | ImGuiTableColumnFlags_WidthStretch, 1.0f, MyItemColumnID_Quantity);// , ImGuiTableColumnFlags_WidthAutoResize);
+            ImGui::TableSetupColumn("Description", ImGuiTableColumnFlags_WidthStretch, 1.0f, MyItemColumnID_Description);
             ImGui::TableSetupColumn("Hidden",      ImGuiTableColumnFlags_DefaultHide | ImGuiTableColumnFlags_NoSort);
 
             // Sort our data if sort specs have been changed!
